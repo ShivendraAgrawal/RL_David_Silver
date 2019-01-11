@@ -86,6 +86,24 @@ def find_optimal_policy(Q_values, terminal_states):
         policy[x][y] = None
     return policy
 
+# A function to print a 2d matrix neatly
+def print_matrix(matrix):
+    n_rows = len(matrix)
+    n_columns = len(matrix[0])
+    print("  ", end=" ")
+    for i in range(n_columns):
+        print(i, end=" ")
+    print("\n")
+    for i in range(n_rows):
+        for j in range(n_columns):
+            to_print = "-"
+            if j == 0:
+                print(i, end="  ")
+            if matrix[i][j] != " ":
+                to_print = matrix[i][j]
+            print(to_print, end=" ")
+        print("")
+
 
 def print_prettified_policy(optimal_policy):
     '''
@@ -99,8 +117,7 @@ def print_prettified_policy(optimal_policy):
         for j in range(len(optimal_policy[0])):
             prettified_optimal_policy[i][j] = visualPolicyMap[optimal_policy[i][j]]
     print("\nOne of the optimal policies:\n")
-    for row in prettified_optimal_policy:
-        print(row)
+    print_matrix(prettified_optimal_policy)
 
 
 def find_path(start_state, optimal_policy, terminal_states, windy_columns):
@@ -134,14 +151,13 @@ def find_path(start_state, optimal_policy, terminal_states, windy_columns):
         # Mark the state as a part of the path
         path[x][y] = "*"
     print("\nOne of the optimal paths :\n")
-    for row in path:
-        print(row)
+    print_matrix(path)
     print("\ntotal time steps taken : {}\n".format(abs(total_reward)))
 
 
 def SARSA(Q_values, alpha, gamma, epsilon, terminal_states, windy_columns, n_rows, n_columns):
     '''
-    The function implementing the vanilla SARSA algorithm for
+    The function implementing the SARSA(0) algorithm for
     updating Q values each time step for a single episode
     :param Q_values: A dict of dict with 1st key as state
                     and 2nd as action and value as the Q value
