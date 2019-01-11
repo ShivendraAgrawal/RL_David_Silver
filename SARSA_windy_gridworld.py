@@ -1,7 +1,7 @@
 import random
 from pprint import pprint
 
-def epsilon_greedy(Q_values, s, epsilon = 0.2):
+def epsilon_greedy(Q_values, s, epsilon):
     random_number = random.random()
     if random_number < epsilon:
         return random.choice(['left', 'right', 'up', 'down'])
@@ -35,8 +35,8 @@ def windy_action(x, y, terminal_states, action, windy_columns, n_rows, n_columns
     intended_x, intended_y = intended_next_state
     # Initialing the actual state after environmental interference
     actual_x, actual_y = intended_x, intended_y
-    if intended_y in windy_columns:
-        actual_x = intended_x - windy_columns[intended_y]
+    if y in windy_columns:
+        actual_x = intended_x - windy_columns[y]
     actual_x = 0 if actual_x < 0 else actual_x
 
     return -1, (actual_x, actual_y)
@@ -56,6 +56,7 @@ def find_optimal_policy(Q_values, terminal_states):
         policy[x][y] = None
     return policy
 
+
 def print_prettified_policy(optimal_policy):
     prettified_optimal_policy = [[None for _ in optimal_policy[0]] for _ in optimal_policy]
     visualPolicyMap = {'left': '←', 'right': '➜', 'up': '↑', 'down': '↓', None : '∅'}
@@ -66,27 +67,33 @@ def print_prettified_policy(optimal_policy):
     for row in prettified_optimal_policy:
         print(row)
 
-def find_path(start_state, optimal_policy, terminal_states):
+
+def find_path(start_state, optimal_policy, terminal_states, windy_columns):
     path = [[" " for _ in optimal_policy[0]] for _ in optimal_policy]
     current_state = start_state
+    x, y = current_state
+    path[x][y] = "*"
+    total_reward = 0
 
     while current_state not in terminal_states:
+        next_action = optimal_policy[x][y]
+
+        reward, next_state = windy_action(x, y, terminal_states, next_action,
+                                  windy_columns, len(path), len(path[0]))
+        total_reward += reward
+        current_state = next_state
         x, y = current_state
         path[x][y] = "*"
-        next_action = optimal_policy[x][y]
-        neighbors = {'left': (x, y - 1) if y != 0 else (x, y),
-                     'right': (x, y + 1) if y != len(optimal_policy[0]) - 1 else (x, y),
-                     'up': (x - 1, y) if x != 0 else (x, y),
-                     'down': (x + 1, y) if x != len(optimal_policy) - 1 else (x, y)}
-        next_state = neighbors[next_action]
-        current_state = next_state
-    print("\nOne of the optimal paths:\n")
+    print("\nOne of the optimal paths :\n")
     for row in path:
         print(row)
+    print("\ntotal time steps taken : {}\n".format(abs(total_reward)))
 
-def SARSA(Q_values, alpha, gamma, terminal_states, windy_columns, n_rows, n_columns):
+
+def SARSA(Q_values, alpha, gamma, epsilon, terminal_states, windy_columns, n_rows, n_columns):
     current_state = (3, 0) # could be anything
-    current_action = epsilon_greedy(Q_values, current_state, epsilon = 0.2)
+    current_state = (random.randint(0, n_rows-1), random.randint(0, n_columns-1))
+    current_action = epsilon_greedy(Q_values, current_state, epsilon)
     next_state, next_action = None, None
     count = 0
     while next_state not in terminal_states:
@@ -97,13 +104,13 @@ def SARSA(Q_values, alpha, gamma, terminal_states, windy_columns, n_rows, n_colu
                                                   current_action,
                                                   windy_columns,
                                                   n_rows, n_columns)
-        next_action = epsilon_greedy(Q_values, next_state, epsilon=0.2) # Q values not updated so far
+        next_action = epsilon_greedy(Q_values, next_state, epsilon) # Q values not updated so far
         Q_values[current_state][current_action] += alpha * (current_reward + gamma
                                                             * Q_values[next_state][next_action]
                                                             - Q_values[current_state][current_action])
         current_state = next_state
         current_action = next_action
-    print("Current episode ran for {} time steps".format(count))
+    # print("Current episode ran for {} time steps".format(count))
     return Q_values
 
 
@@ -115,13 +122,14 @@ def main(rounds):
     terminal_states =  [(3, 7)]
     alpha = 0.5
     gamma = 1.0
+    epsilon = 0.2
 
     Q_values = {state : {'left': initial_q_value, 'right': initial_q_value,
                  'up': initial_q_value, 'down': initial_q_value}
                 for state in [state for row in gridWorld for state in row]}
 
     for i in range(rounds):
-        Q_values = SARSA(Q_values, alpha, gamma, terminal_states, windy_columns, n_rows, n_columns)
+        Q_values = SARSA(Q_values, alpha, gamma, epsilon, terminal_states, windy_columns, n_rows, n_columns)
 
     # pprint(Q_values)
 
@@ -130,8 +138,8 @@ def main(rounds):
         print(row)
     print_prettified_policy(optimal_policy)
 
-    find_path((3, 3), optimal_policy, terminal_states)
+    find_path((3, 0), optimal_policy, terminal_states, windy_columns)
 
 
 if __name__ == "__main__":
-    main(rounds = 1700)
+    main(rounds = 10000)
