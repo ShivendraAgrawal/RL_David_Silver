@@ -35,18 +35,35 @@
                 <button id="22" style="float:left;" class="square"></button><br>
             </div>
             <div class="col-sm" style="font-size: 24px;font-weight: bold;">
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="exampleRadios" id="player1" value="player1" checked>
-                    <label class="form-check-label" for="player1">
-                        Player 1
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="exampleRadios" id="player2" value="player2">
-                    <label class="form-check-label" for="player2">
-                        Player 2
-                    </label>
-                </div>
+                <form id="game_mode">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="exampleRadios" id="playerplayer" value="player1" checked>
+                        <label class="form-check-label" for="playerplayer">
+                            Human vs Human
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="exampleRadios" id="playercomputer" value="player2">
+                        <label class="form-check-label" for="playercomputer">
+                            Human vs Computer
+                        </label>
+                    </div>
+                </form>
+                <form id="first_player">
+                    <div class="form-check" style="margin-top:40px;">
+                        <input class="form-check-input" type="radio" name="exampleRadios" id="player1" value="player1" checked>
+                        <label class="form-check-label" for="player1">
+                            Player 1 ⟶ X
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="exampleRadios" id="player2" value="player2">
+                        <label class="form-check-label" for="player2">
+                            Player 2 ⟶ O
+                        </label>
+                    </div>
+                </form>
+                <button style="margin-top:100px;" id="reset" type="button" class="btn btn-dark">Reset</button>
             </div>
         </div>
 
