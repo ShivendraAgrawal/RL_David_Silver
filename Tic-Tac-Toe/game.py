@@ -42,6 +42,15 @@ class TicTacToe:
     def toggle_turn(self):
         self.turn = 2 if self.turn == 1 else 1
 
+    def get_current_state(self):
+        return tuple(tuple(x) for x in self.board)
 
+    def get_empty_cells(self):
+        empty_cells = []
+        for i in range(3):
+            for j in range(3):
+                if self.board[i][j] == self.empty:
+                    empty_cells.append((i, j))
+        return empty_cells
 
 
