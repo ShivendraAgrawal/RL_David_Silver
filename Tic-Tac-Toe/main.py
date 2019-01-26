@@ -50,7 +50,6 @@ def random_player_one_round():
     global ticTacToe
 
     button_id = request.form['button_id']
-    print(button_id)
     clicked_grid = (int(button_id[0]), int(button_id[1]))
 
     ticTacToe.set_one_grid(clicked_grid[0], clicked_grid[1])
