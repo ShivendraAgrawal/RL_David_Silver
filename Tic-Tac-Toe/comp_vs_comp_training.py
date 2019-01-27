@@ -1,3 +1,4 @@
+import time
 from pprint import pprint
 from game import TicTacToe
 import random, pickle
@@ -24,7 +25,50 @@ def epsilon_greedy(Q_values, s, actions_per_state, epsilon):
         except ValueError:
             return None
 
-def take_action(current_action):
+def epsilon_greedy_for_opposition(Q_values, s, actions_per_state, epsilon):
+    global ticTacToe
+
+    if s not in Q_values:
+        Q_values[s] = actions_per_state.copy()
+
+    random_number = random.random()
+    # With ε probability choose any action
+    if random_number < epsilon:
+        return random.choice(ticTacToe.get_empty_cells())
+    # With 1 - ε probability pick the action greedily
+    else:
+        try:
+            return min(ticTacToe.get_empty_cells(), key = lambda a: Q_values[s][a])
+        except ValueError:
+            return None
+
+def take_action_with_Q_opposition(current_action, Q_values, actions_per_state, epsilon):
+    global ticTacToe
+    ticTacToe.set_one_grid(current_action[0], current_action[1])
+    solved, result = ticTacToe.is_solved()
+    if solved:
+        reward = result
+        return reward, 'terminal'
+    ticTacToe.toggle_turn()
+
+    # Q opposition player playing one turn
+    selected_grid = epsilon_greedy_for_opposition(Q_values,
+                                                  ticTacToe.get_current_state(),
+                                                  actions_per_state,
+                                                  epsilon)
+    if selected_grid not in ticTacToe.get_empty_cells():
+        selected_grid = random.choice(ticTacToe.get_empty_cells())
+
+    ticTacToe.set_one_grid(selected_grid[0], selected_grid[1])
+    solved, result = ticTacToe.is_solved()
+    if solved:
+        reward = -1 * result
+        return reward, 'terminal'
+    ticTacToe.toggle_turn()
+
+    return 0, ticTacToe.get_current_state()
+
+def take_action_with_random_opposition(current_action):
     global ticTacToe
     ticTacToe.set_one_grid(current_action[0], current_action[1])
     solved, result = ticTacToe.is_solved()
@@ -62,8 +106,12 @@ def Q_Learning(Q_values, alpha, gamma, epsilon, actions_per_state):
         # Pick the action using ε-greedy strategy
         current_action = epsilon_greedy(Q_values, current_state, actions_per_state, epsilon)
 
-        # Take the action with wind interference
-        current_reward, next_state = take_action(current_action)
+        # Take the action either with Q opposition or random opposition
+        # current_reward, next_state = take_action_with_random_opposition(current_action)
+        current_reward, next_state = take_action_with_Q_opposition(current_action,
+                                                                   Q_values,
+                                                                   actions_per_state,
+                                                                   epsilon)
 
         if current_reward == 1:
             wins += 1
@@ -134,7 +182,13 @@ def main(rounds):
         if first_turn == 'random':
             first_turn_random_count += 1
             # Random player playing one turn
-            selected_grid = random.choice(ticTacToe.get_empty_cells())
+            # Q opposition player playing one turn
+            selected_grid = epsilon_greedy_for_opposition(Q_values,
+                                                          ticTacToe.get_current_state(),
+                                                          actions_per_state,
+                                                          epsilon)
+            if selected_grid not in ticTacToe.get_empty_cells():
+                selected_grid = random.choice(ticTacToe.get_empty_cells())
             ticTacToe.set_one_grid(selected_grid[0], selected_grid[1])
             ticTacToe.toggle_turn()
 
@@ -151,4 +205,8 @@ def main(rounds):
     pickle.dump(policy, open(filename, "wb"))
 
 if __name__ == "__main__":
+    start_time = time.time()
     main(rounds = 1000000)
+    print("Time taken = {}".format(time.time() - start_time))
+
+    # 1000000 takes ~ 118 seconds

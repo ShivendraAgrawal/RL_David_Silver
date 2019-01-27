@@ -31,7 +31,13 @@ class TicTacToe:
             return True, 0
         return False, None
 
-
+    def get_board_html(self):
+        html_grid = {}
+        for i in range(3):
+            for j in range(3):
+                html_grid[str(i)+str(j)] = self.board[i][j] \
+                    if self.board[i][j] != self.empty else ""
+        return html_grid
 
     def set_one_grid(self, x, y):
         if self.turn == 1:

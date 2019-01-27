@@ -4,7 +4,7 @@ import pickle
 import random
 from game import TicTacToe
 from flask_cors import CORS
-from flask import Flask, render_template, request, url_for, Response, redirect, send_from_directory
+from flask import Flask, request, Response
 
 app = Flask(__name__, static_url_path='/static')
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
@@ -61,7 +61,7 @@ def random_player_one_round():
         player = ticTacToe.turn if result == 1 else 0
         return Response(json.dumps({'player': player,
                                     'solved': True,
-                                    'buttonID': None}),
+                                    'boardHTML': ticTacToe.get_board_html()}),
                         mimetype='application/json')
 
     ticTacToe.toggle_turn()
@@ -73,13 +73,13 @@ def random_player_one_round():
         player = ticTacToe.turn if result == 1 else 0
         return Response(json.dumps({'player': player,
                                     'solved': True,
-                                    'buttonID': "".join([str(i) for i in selected_grid])}),
+                                    'boardHTML': ticTacToe.get_board_html()}),
                         mimetype='application/json')
 
     ticTacToe.toggle_turn()
 
     response = {'player': ticTacToe.turn, 'solved': False,
-                'buttonID' : "".join([str(i) for i in selected_grid])}
+                'boardHTML': ticTacToe.get_board_html()}
 
 
     return Response(json.dumps(response),
@@ -112,7 +112,7 @@ def computer_player_one_round():
         player = ticTacToe.turn if result == 1 else 0
         return Response(json.dumps({'player': player,
                                     'solved': True,
-                                    'buttonID': None}),
+                                    'boardHTML': ticTacToe.get_board_html()}),
                         mimetype='application/json')
 
     ticTacToe.toggle_turn()
@@ -131,13 +131,13 @@ def computer_player_one_round():
         player = ticTacToe.turn if result == 1 else 0
         return Response(json.dumps({'player': player,
                                     'solved': True,
-                                    'buttonID': "".join([str(i) for i in selected_grid])}),
+                                    'boardHTML': ticTacToe.get_board_html()}),
                         mimetype='application/json')
 
     ticTacToe.toggle_turn()
 
     response = {'player': ticTacToe.turn, 'solved': False,
-                'buttonID' : "".join([str(i) for i in selected_grid])}
+                'boardHTML': ticTacToe.get_board_html()}
 
 
     return Response(json.dumps(response),

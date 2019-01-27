@@ -5,6 +5,14 @@
 var game_mode;
 var start_position;
 
+function redrawBoard(boardHTML) {
+    for (var key in boardHTML) {
+        if (boardHTML.hasOwnProperty(key)) {
+            $("#" + key).html(boardHTML[key]);
+        }
+    }
+}
+
 $("#start").click(function(e) {
     e.preventDefault();
     console.log("Start clicked");
@@ -93,22 +101,16 @@ $("button[name=grid]").click(function(e) {
             },
             success: function (result) {
                 console.log(result);
-                computer_buttonID = result.buttonID;
+                boardHTML = result.boardHTML;
 
                 if (result.player === 1) {
-                    gridText = 'X';
                     $("#message").html("Player 2's turn");
-                    $("#" + buttonID).html(gridText);
-                    $("#" + computer_buttonID).html('O');
-
+                    redrawBoard(boardHTML)
                 }
                 else {
-                    gridText = 'O';
                     $("#message").html("Player 1's turn");
-                    $("#" + buttonID).html(gridText);
-                    $("#" + computer_buttonID).html('X');
+                    redrawBoard(boardHTML)
                 }
-
 
                 if (result.solved) {
                     if (result.player != 0) {
