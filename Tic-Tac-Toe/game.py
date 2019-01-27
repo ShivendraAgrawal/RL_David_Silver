@@ -31,6 +31,8 @@ class TicTacToe:
             return True, 0
         return False, None
 
+
+
     def set_one_grid(self, x, y):
         if self.turn == 1:
             to_set = 'X'

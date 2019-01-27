@@ -15,7 +15,7 @@ $("#start").click(function(e) {
     if (start_position == "player2" && game_mode == "human_computer"){
         $.ajax({
             type: "GET",
-            url: "http://0.0.0.0:5000/random_player_first_round_as_player_1",
+            url: "http://0.0.0.0:5000/computer_player_first_round_as_player_1",
             success: function(result) {
                 console.log(result);
                 $("#" + result.buttonID).html("X");
@@ -87,7 +87,7 @@ $("button[name=grid]").click(function(e) {
     else {
         $.ajax({
             type: "POST",
-            url: "http://0.0.0.0:5000/random_player",
+            url: "http://0.0.0.0:5000/computer_player",
             data: {
                 button_id: buttonID
             },
