@@ -199,14 +199,14 @@ def main(rounds):
     # pprint(Q_values)
     policy = find_optimal_policy(Q_values)
     print("First turn by random players = {}%".format(first_turn_random_count*100/rounds))
-    filename = "Q_values_{}_episodes.p".format(rounds)
+    filename = "Q_values_{}_episodes_025_epsilon.p".format(rounds)
     pickle.dump(Q_values, open(filename, "wb"))
-    filename = "policy_{}_episodes.p".format(rounds)
+    filename = "policy_{}_episodes_025_epsilon.p".format(rounds)
     pickle.dump(policy, open(filename, "wb"))
 
 if __name__ == "__main__":
     start_time = time.time()
-    main(rounds = 5000000)
+    main(rounds = 10000000)
     print("Time taken = {}".format(time.time() - start_time))
 
     # 1000000 takes ~ 118 seconds

@@ -9,7 +9,7 @@ from flask import Flask, request, Response
 app = Flask(__name__, static_url_path='/static')
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 ticTacToe = None
-policy = pickle.load(open("policy_5000000_episodes.p", "rb"))
+policy = pickle.load(open("policy_10000000_episodes.p", "rb"))
 
 
 def get_file(filename):
@@ -25,6 +25,13 @@ def index():
     ticTacToe = TicTacToe()
     content = get_file('tic-tac-toe.html')
     return Response(content, mimetype="text/html")
+
+@app.route('/reset', methods=['GET'])
+def reset():
+    global ticTacToe
+    ticTacToe = TicTacToe()
+    return Response(json.dumps({'boardHTML': ticTacToe.get_board_html()}),
+                    mimetype='application/json')
 
 @app.route('/play_one_round', methods=['POST'])
 def play_one_round():
@@ -157,16 +164,5 @@ def computer_player_first_round():
                     [str(i) for i in selected_grid])}),
                     mimetype='application/json')
 
-def main():
-    ticTacToe = TicTacToe()
-
-    ticTacToe.set_one_grid(0, 0)
-    ticTacToe.set_one_grid(1, 0)
-    ticTacToe.set_one_grid(2, 0)
-
-    ticTacToe.print_board()
-    print(ticTacToe.get_current_state())
-
 if __name__ == "__main__":
-    main()
     app.run(host='0.0.0.0')

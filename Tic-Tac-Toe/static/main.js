@@ -4,6 +4,7 @@
 
 var game_mode;
 var start_position;
+var start_clicked = false;
 
 function redrawBoard(boardHTML) {
     for (var key in boardHTML) {
@@ -13,12 +14,32 @@ function redrawBoard(boardHTML) {
     }
 }
 
+$("#reset").click(function(e) {
+    e.preventDefault();
+    console.log("Reset clicked");
+
+    $.ajax({
+        type: "GET",
+        url: "http://0.0.0.0:5000/reset",
+        success: function(result) {
+            $("#message").html("Select your preference and click Start.");
+            redrawBoard(result.boardHTML);
+            start_clicked = false;
+        },
+        error: function(result) {
+            console.log("Something went wrong");
+        }
+    });
+});
+
 $("#start").click(function(e) {
     e.preventDefault();
     console.log("Start clicked");
 
     game_mode = $("input[name='game_mode']:checked").val();
     start_position = $("input[name='start_position']:checked").val();
+
+    start_clicked = true;
 
     if (start_position == "player2" && game_mode == "human_computer"){
         $.ajax({
@@ -51,81 +72,88 @@ $("#start").click(function(e) {
 
 $("button[name=grid]").click(function(e) {
     e.preventDefault();
-    var gridText;
-    var buttonID = this.id;
-    var computer_buttonID;
 
-    if (game_mode == "human_human") {
-        $.ajax({
-            type: "POST",
-            url: "http://0.0.0.0:5000/play_one_round",
-            data: {
-                button_id: buttonID
-            },
-            success: function (result) {
-                console.log(result);
-
-                if (result.player === 1) {
-                    gridText = 'X';
-                    $("#message").html("Player 2's turn");
-                }
-                else {
-                    gridText = 'O';
-                    $("#message").html("Player 1's turn");
-                }
-
-                $("#" + buttonID).html(gridText);
-
-                if (result.solved) {
-                    if (result.player != 0) {
-                        console.log(result.player + " won!!");
-                        $("#message").html("Player " + result.player + " won!!")
-                    }
-                    else {
-                        $("#message").html("Game draw!!")
-                    }
-                }
-
-            },
-            error: function (result) {
-                console.log("Something went wrong");
-            }
-        });
+    if (!start_clicked){
+        $("#warningModal").modal();
     }
     else {
-        $.ajax({
-            type: "POST",
-            url: "http://0.0.0.0:5000/computer_player",
-            data: {
-                button_id: buttonID
-            },
-            success: function (result) {
-                console.log(result);
-                boardHTML = result.boardHTML;
 
-                if (result.player === 1) {
-                    $("#message").html("Player 2's turn");
-                    redrawBoard(boardHTML)
-                }
-                else {
-                    $("#message").html("Player 1's turn");
-                    redrawBoard(boardHTML)
-                }
+        var gridText;
+        var buttonID = this.id;
+        var computer_buttonID;
 
-                if (result.solved) {
-                    if (result.player != 0) {
-                        console.log(result.player + " won!!");
-                        $("#message").html("Player " + result.player + " won!!")
+        if (game_mode == "human_human") {
+            $.ajax({
+                type: "POST",
+                url: "http://0.0.0.0:5000/play_one_round",
+                data: {
+                    button_id: buttonID
+                },
+                success: function (result) {
+                    console.log(result);
+
+                    if (result.player === 1) {
+                        gridText = 'X';
+                        $("#message").html("Player 2's turn");
                     }
                     else {
-                        $("#message").html("Game draw!!")
+                        gridText = 'O';
+                        $("#message").html("Player 1's turn");
                     }
-                }
 
-            },
-            error: function (result) {
-                console.log("Something went wrong");
-            }
-        });
+                    $("#" + buttonID).html(gridText);
+
+                    if (result.solved) {
+                        if (result.player != 0) {
+                            console.log(result.player + " won!!");
+                            $("#message").html("Player " + result.player + " won!!")
+                        }
+                        else {
+                            $("#message").html("Game draw!!")
+                        }
+                    }
+
+                },
+                error: function (result) {
+                    console.log("Something went wrong");
+                }
+            });
+        }
+        else {
+            $.ajax({
+                type: "POST",
+                url: "http://0.0.0.0:5000/computer_player",
+                data: {
+                    button_id: buttonID
+                },
+                success: function (result) {
+                    console.log(result);
+                    boardHTML = result.boardHTML;
+
+                    if (result.player === 1) {
+                        $("#message").html("Player 2's turn");
+                        redrawBoard(boardHTML)
+                    }
+                    else {
+                        $("#message").html("Player 1's turn");
+                        redrawBoard(boardHTML)
+                    }
+
+                    if (result.solved) {
+                        if (result.player != 0) {
+                            console.log(result.player + " won!!");
+                            $("#message").html("Player " + result.player + " won!!")
+                        }
+                        else {
+                            $("#message").html("Game draw!!")
+                        }
+                    }
+
+                },
+                error: function (result) {
+                    console.log("Something went wrong");
+                }
+            });
+        }
     }
 });
