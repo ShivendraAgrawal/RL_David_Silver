@@ -9,7 +9,7 @@ from flask import Flask, request, Response
 app = Flask(__name__, static_url_path='/static')
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 ticTacToe = None
-policy = pickle.load(open("policy_1000000_episodes.p", "rb"))
+policy = pickle.load(open("policy_5000000_episodes.p", "rb"))
 
 
 def get_file(filename):

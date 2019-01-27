@@ -206,7 +206,8 @@ def main(rounds):
 
 if __name__ == "__main__":
     start_time = time.time()
-    main(rounds = 1000000)
+    main(rounds = 5000000)
     print("Time taken = {}".format(time.time() - start_time))
 
     # 1000000 takes ~ 118 seconds
+    # 5000000 takes ~ 590 seconds
